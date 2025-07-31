@@ -1,4 +1,4 @@
-<img width="606" height="538" alt="image" src="https://github.com/user-attachments/assets/60c6bc9b-24b6-48d7-8a4c-d75cc98daee4" />
+
 <h1 align="center">
      Jupyterhub Helm
     <br>
