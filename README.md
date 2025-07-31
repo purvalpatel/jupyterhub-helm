@@ -1,3 +1,8 @@
+
+<h1 align="center">
+     Jupyterhub Helm
+    <br>
+</h1>
 Jupyerhub installation with Kubernetes:
 The setup is done through the official documentation - https://z2jh.jupyter.org/en/stable/
 
