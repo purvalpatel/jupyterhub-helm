@@ -52,7 +52,7 @@ Revert back to default namespace:
 Below are some post installation checks:
 Verify that created Pods enter a Running state:
       kubectl --namespace=jupyter get pod
-      ![screenshot]
+      ![screenshot]getpods.png
 
     If a pod is stuck with a Pending or ContainerCreating status, diagnose with:
       kubectl --namespace=jupyter describe pod <name of pod>
