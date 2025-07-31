@@ -262,5 +262,9 @@ http://127.0.0.1:30235/hub/change-password
 
 http://127.0.0.1:30235/hub/change-password/username
 
+Provide different image to different profiles:
+--------------------------------------------
+https://github.com/purvalpatel/jupyterhub-helm/tree/1e3a8d3de3ab98ee80adb62c478aae8597209479/test
+
 
 
