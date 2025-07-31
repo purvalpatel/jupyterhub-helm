@@ -264,7 +264,7 @@ http://127.0.0.1:30235/hub/change-password/username
 
 Provide different image to different profiles:
 --------------------------------------------
-[https://github.com/purvalpatel/jupyterhub-helm/tree/1e3a8d3de3ab98ee80adb62c478aae8597209479/test](https://github.com/purvalpatel/jupyterhub-helm/blob/1e3a8d3de3ab98ee80adb62c478aae8597209479/test/diffprofile.yaml)
+[diffprofile.yaml](https://github.com/purvalpatel/jupyterhub-helm/blob/1e3a8d3de3ab98ee80adb62c478aae8597209479/test/diffprofile.yaml)
 
 provide multiple GPUs to profile:
 -----------------------------
@@ -397,16 +397,16 @@ and reapply the changes, `kubectl apply -f sc-nfs-retain.yaml`
 Setup of multiple profile selection with custom image:
 ----------------------
 config.yaml
-https://github.com/purvalpatel/jupyterhub-helm/blob/ef5596f32b105fce027667ff47cf65750c7b5b96/test/profile-selection-custom-image.yaml
+[config.yaml](https://github.com/purvalpatel/jupyterhub-helm/blob/ef5596f32b105fce027667ff47cf65750c7b5b96/test/profile-selection-custom-image.yaml)
 
 start-singleuser.sh
-https://github.com/purvalpatel/jupyterhub-helm/blob/fa7053bc1b3175409e8d24fc048b31e2a6a939e7/test/start-singleuser.sh
+[start-singleuser.sh](https://github.com/purvalpatel/jupyterhub-helm/blob/fa7053bc1b3175409e8d24fc048b31e2a6a939e7/test/start-singleuser.sh)
 
 Dockerfile
-https://github.com/purvalpatel/jupyterhub-helm/blob/fa7053bc1b3175409e8d24fc048b31e2a6a939e7/test/Dockerfile
+[Dockerfile](https://github.com/purvalpatel/jupyterhub-helm/blob/fa7053bc1b3175409e8d24fc048b31e2a6a939e7/test/Dockerfile)
 
 dind-entrypoint.sh
-https://github.com/purvalpatel/jupyterhub-helm/blob/78dc3b84d8c8b193816d066073e3798656c82349/test/dind-entrypoint.sh
+[dind-entrypoint.sh](https://github.com/purvalpatel/jupyterhub-helm/blob/78dc3b84d8c8b193816d066073e3798656c82349/test/dind-entrypoint.sh)
 
 
 Ask for extra parameters on sign up:
@@ -442,5 +442,24 @@ Upgrade version:
 
 
 GPU Selection Dropdown:
+------------------------
+[gpu-selection-dropdown.yaml](https://github.com/purvalpatel/jupyterhub-helm/blob/3d44eec49537069020401fdaa3b125faf4206cdb/test/gpu-selection-dropdown.yaml)
+
+To add R Launcher:
+-----------------
+```yaml
+    - display_name: "GPU 6"
+      description: "Access to GPU ID 6"
+      slug: "gpu6"
+      kubespawner_override:
+        image: quay.io/jupyter/r-notebook:2025-07-28
+#        image: quay.io/jupyterhub/k8s-singleuser-sample:4.2.0
+        extra_resource_limits:
+          nvidia.com/gpu: "6"
+        environment:
+          NVIDIA_VISIBLE_DEVICES: "6"
+```
+
+
 
 
