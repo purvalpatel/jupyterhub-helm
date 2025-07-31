@@ -405,6 +405,8 @@ https://github.com/purvalpatel/jupyterhub-helm/blob/fa7053bc1b3175409e8d24fc048b
 Dockerfile
 https://github.com/purvalpatel/jupyterhub-helm/blob/fa7053bc1b3175409e8d24fc048b31e2a6a939e7/test/Dockerfile
 
+dind-entrypoint.sh
+https://github.com/purvalpatel/jupyterhub-helm/blob/78dc3b84d8c8b193816d066073e3798656c82349/test/dind-entrypoint.sh
 
 
 
