@@ -1,0 +1,84 @@
+hub:
+  config:
+    JupyterHub:
+      authenticator_class: nativeauthenticator.NativeAuthenticator
+    Authenticator:
+      allowed_users:
+        - admin
+      admin_users:
+        - admin
+    NativeAuthenticator:
+      create_users: true
+      allow_admin_access: true
+      allow_unauthenticated_users: true
+
+
+singleuser:
+  profileList:
+    - display_name: "GPU 0,1"
+      description: "Access to GPU id 0,1"
+      kubespawner_override:
+        image: quay.io/jupyterhub/k8s-singleuser-sample:4.2.0
+        extra_resource_limits:
+          nvidia.com/gpu: "0"
+          nvidia.com/gpu: "1"
+        environment:
+          NVIDIA_VISIBLE_DEVICES: "0,1"
+    - display_name: "GPU 2"
+      description: "Access to GPU ID 2"
+      kubespawner_override:
+        image: docker.merai.app/nuvo_images/nvidia_environment:0.7
+        extra_resource_limits:
+          nvidia.com/gpu: "2"
+        environment:
+          NVIDIA_VISIBLE_DEVICES: "2"
+    - display_name: "GPU 3"
+      description: "Access to GPU ID 3"
+      kubespawner_override:
+        image: docker.merai.app/nuvo_images/nvidia_environment:0.7
+        extra_resource_limits:
+          nvidia.com/gpu: "3"
+        environment:
+          NVIDIA_VISIBLE_DEVICES: "3"
+    - display_name: "GPU 4"
+      description: "Access to GPU ID 4- nvidia/cuda:12.6.3-cudnn-runtime-ubuntu24.04"
+      kubespawner_override:
+        image: nvidia/cuda:12.6.3-cudnn-runtime-ubuntu24.04
+        extra_resource_limits:
+          nvidia.com/gpu: "4"
+        environment:
+          NVIDIA_VISIBLE_DEVICES: "4"
+    - display_name: "GPU 5"
+      description: "Access to GPU ID 5"
+      kubespawner_override:
+        extra_resource_limits:
+          nvidia.com/gpu: "5"
+        environment:
+          NVIDIA_VISIBLE_DEVICES: "5"
+    - display_name: "GPU 6"
+      description: "Access to GPU ID 6"
+      kubespawner_override:
+        extra_resource_limits:
+          nvidia.com/gpu: "6"
+        environment:
+          NVIDIA_VISIBLE_DEVICES: "6"
+    - display_name: "GPU 7"
+      description: "Access to GPU ID 7"
+      kubespawner_override:
+        extra_resource_limits:
+          nvidia.com/gpu: "7"
+        environment:
+          NVIDIA_VISIBLE_DEVICES: "7"
+
+  storage:
+    type: dynamic
+    dynamic:
+      storageClass: nfs-jupyterhub
+    capacity: 100Gi
+    homeMountPath: /home/jovyan/work
+  initContainers:
+    - name: init-gpu
+      image: nvidia/cuda:12.2.0-runtime-ubuntu22.04
+      command:
+        - sleep
+        - "1"
