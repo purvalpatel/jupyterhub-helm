@@ -78,3 +78,59 @@ Verify that created Pods enter a Running state:
 
     Try insecure HTTP access: http://localhost:8080
 
+User Creation:
+---------------
+When trying to create user for the first time then it will go to pending state.
+if face error,
+  Type     Reason            Age    From                 Message
+  ----     ------            ----   ----                 -------
+  Warning  FailedScheduling  2m31s  jhub-user-scheduler  0/1 nodes are available: pod has unbound immediate PersistentVolumeClaims. preemption: 0/1 nodes are available: 1 Preemption is not helpful for scheduling.
+
+Then the reason behind this is Dynamic storage volume is not found.
+Solution:
+Create Dynamic PVC:
+# kubectl apply -f https://raw.githubusercontent.com/rancher/local-path-provisioner/master/deploy/local-path-storage.yaml
+
+Make it default:
+kubectl patch storageclass local-path -p \
+  '{"metadata": {"annotations":{"storageclass.kubernetes.io/is-default-class":"true"}}}'
+
+and again upgrade the version:
+# helm upgrade jhub jupyterhub/jupyterhub -n jupyter -f config.yaml
+
+Allow Admin user
+----------------
+- Here we are using dummy authenticator class(for testing). all users will able to login with the same password.
+
+#config.yaml
+
+singleuser:
+  storage:
+    type: none
+
+hub:
+  config:
+    JupyterHub:
+      authenticator_class: dummy
+    DummyAuthenticator:
+      password: "admin@123"
+  extraConfig:
+    allowedUsers: |
+      c.Authenticator.allowed_users = {"admin"}
+      c.Authenticator.admin_users = {"admin"}
+
+upgrade the version:
+# helm upgrade --install jhub jupyterhub/jupyterhub   --namespace jupyter   --create-namespace   -f config.yaml
+
+If You face error like,
+If error while upgrading service:
+Error: Get "https://jupyterhub.github.io/helm-chart/jupyterhub-4.2.0.tgz": EOF
+
+Solution:
+# helm repo remove jupyterhub
+# helm repo add jupyterhub https://hub.jupyter.org/helm-chart/
+# helm repo update
+# helm upgrade --install jhub jupyterhub/jupyterhub   --namespace jupyter   --create-namespace   -f config.yaml
+
+
+
