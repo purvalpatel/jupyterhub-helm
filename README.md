@@ -385,5 +385,16 @@ upgrade version:
 Need to delete and re-created PVC. then it will show the updated size.
 Make sure the StorageClass Policy is Retain.
 
+If it is not retain then,
+`kubectl get storageclass nfs-jupyterhub -o yaml > sc-nfs-retain.yaml`
+
+Delete the storage class,
+`kubectl delete storageclass nfs-jupyterhub`
+
+make changes into sc-nfs-retain.yaml to Retain.
+and reapply the changes, `kubectl apply -f sc-nfs-retain.yaml`
+
+Setup of multiple profile selection with custom image:
+----------------------
 
 
