@@ -260,5 +260,7 @@ admin can change password from here.
 
 http://127.0.0.1:30235/hub/change-password
 
-http://127.0.0.1:30235/hub/change-password/<username>
+http://127.0.0.1:30235/hub/change-password/username
+
+
 
