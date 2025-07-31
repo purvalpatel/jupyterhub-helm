@@ -330,7 +330,48 @@ kubectl get pvc -n jupyter
 kubectl get pv -n jupyter
 ```
 
+Now use this storageclass into our deployment,
+config.yaml
+```yaml
+hub:
+  config:
+    JupyterHub:
+      authenticator_class: nativeauthenticator.NativeAuthenticator
+    Authenticator:
+      allowed_users:
+        - admin
+      admin_users:
+        - admin
+    NativeAuthenticator:
+      create_users: true
+      allow_admin_access: true
+      allow_unauthenticated_users: true
 
 
+singleuser:
+  profileList:
+    - display_name: "GPU 0,1"
+      description: "Access to GPU id 0,1"
+      kubespawner_override:
+        image: quay.io/jupyterhub/k8s-singleuser-sample:4.2.0
+        extra_resource_limits:
+          nvidia.com/gpu: "0"
+          nvidia.com/gpu: "1"
+        environment:
+          NVIDIA_VISIBLE_DEVICES: "0,1"
+
+  storage:
+    type: dynamic
+    dynamic:
+      storageClass: nfs-jupyterhub
+    capacity: 100Gi
+    homeMountPath: /home/jovyan/work
+  initContainers:
+    - name: init-gpu
+      image: nvidia/cuda:12.2.0-runtime-ubuntu22.04
+      command:
+        - sleep
+        - "1"
+```
 
 
