@@ -266,6 +266,70 @@ Provide different image to different profiles:
 --------------------------------------------
 [https://github.com/purvalpatel/jupyterhub-helm/tree/1e3a8d3de3ab98ee80adb62c478aae8597209479/test](https://github.com/purvalpatel/jupyterhub-helm/blob/1e3a8d3de3ab98ee80adb62c478aae8597209479/test/diffprofile.yaml)
 
+provide multiple GPUs to profile:
+-----------------------------
+https://github.com/purvalpatel/jupyterhub-helm/blob/9e566bccd05eb75aaffc75bb9653ad9873d3b76c/test/multigpu-profiles.yaml
+
+
+Persist data on NFS Storage server:
+--------------------------
+Create Storage volume which should be expandable.
+For that we are using NFS storage.
+
+Get the network storage location which is mounted in server.
+Here we are taking wekafs storage mounted on /xxxxx-v1.
+
+1. Create Dynamic Persistent volumes.
+2. Setup NFS server On your storage node:
+```bash
+sudo apt install nfs-kernel-server -y
+sudo mkdir -p /m111002-v1/nfs/
+sudo chown nobody:nogroup /m111002-v1/nfs/
+sudo chmod 777 /m111002-v1/nfs/
+```
+
+nano /etc/exports
+```
+/m111002-v1/nfs/ *(rw,sync,no_subtree_check,no_root_squash)
+```
+
+Apply changes:
+`sudo exportfs -a`
+`sudo systemctl restart nfs-kernel-server`
+
+Install NFS client provider:
+`helm repo add nfs-subdir-external-provisioner https://kubernetes-sigs.github.io/nfs-subdir-external-provisioner/`
+```
+helm install nfs-provisioner nfs-subdir-external-provisioner/nfs-subdir-external-provisioner \
+  --set nfs.server=127.0.0.1 \
+  --set nfs.path=/m111002-v1/nfs/ \
+  --set storageClass.name=nfs-jupyterhub
+```
+
+Verify the storageclass:
+`kubectl get storageclass`
+
+If wanted to change Reclaim policy then you can change.
+
+Make changes into config.yaml of helm.
+#config.yaml
+```
+  storage:
+    type: dynamic
+    dynamic:
+      storageClass: nfs-jupyterhub
+    capacity: 100Gi
+    homeMountPath: /home/jovyan/work
+```
+
+Remove it which is created previously.
+
+Now Create user and you will see that PV and PVC is created.
+```
+kubectl get pvc -n jupyter
+kubectl get pv -n jupyter
+```
+
 
 
 
