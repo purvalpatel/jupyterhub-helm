@@ -244,4 +244,21 @@ singleuser:
         environment:
           NVIDIA_VISIBLE_DEVICES: "1"
 ```
+Steps to Create users:
+------------
+Option 1: (not recommended )
+First do add user from admin panel.
+Then do signup with that user and change password.
+
+Option 2:
+1.Do signup from the login page. And the request of authorization is go to administrator.
+Admin can authorize user via - http://127.0.0.1:30235/hub/authorize
+
+2.Now from admin create user again for pod.
+
+admin can change password from here.
+
+http://127.0.0.1:30235/hub/change-password
+
+http://127.0.0.1:30235/hub/change-password/<username>
 
