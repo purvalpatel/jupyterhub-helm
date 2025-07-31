@@ -270,7 +270,7 @@ Provide different image to different profiles:
 
 provide multiple GPUs to profile:
 -----------------------------
-https://github.com/purvalpatel/jupyterhub-helm/blob/9e566bccd05eb75aaffc75bb9653ad9873d3b76c/test/multigpu-profiles.yaml
+[multigpu-profiles.yaml](https://github.com/purvalpatel/jupyterhub-helm/blob/9e566bccd05eb75aaffc75bb9653ad9873d3b76c/test/multigpu-profiles.yaml)
 
 
 Persist data on NFS Storage server:
