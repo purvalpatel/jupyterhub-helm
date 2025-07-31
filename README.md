@@ -396,5 +396,10 @@ and reapply the changes, `kubectl apply -f sc-nfs-retain.yaml`
 
 Setup of multiple profile selection with custom image:
 ----------------------
+config.yaml
+https://github.com/purvalpatel/jupyterhub-helm/blob/ef5596f32b105fce027667ff47cf65750c7b5b96/test/profile-selection-custom-image.yaml
+
+
+
 
 
