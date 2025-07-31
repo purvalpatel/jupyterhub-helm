@@ -1,0 +1,150 @@
+hub:
+  config:
+    JupyterHub:
+      authenticator_class: nativeauthenticator.NativeAuthenticator
+    Authenticator:
+      allowed_users:
+        - admin
+        - shishanshu
+        - nishant
+      admin_users:
+        - admin
+    NativeAuthenticator:
+      enable_signup: true
+      enable_change_password: true
+      create_users: true
+      allow_admin_access: true
+#      allow_unauthenticated_users: true
+  extraConfig:
+    adminUsers: |
+      c.Authenticator.admin_users = {'admin'}
+    native: |
+      c.Authenticator.enable_auth_state = True
+      c.NativeAuthenticator.enable_password_change = True
+    spawnerForm: |
+      # Enable the profile selection form
+      c.Spawner.options_form = """
+      <div class="form-group">
+        <label for="profile">Instance Profile</label>
+        <select name="profile" class="form-control">
+          <option value="default">Default Instance (2 CPU, 4GB RAM)</option>
+          <option value="gpu1">GPU 0,1</option>
+          <option value="gpu2">GPU 2</option>
+          <option value="gpu3">GPU 3</option>
+          <option value="gpu4">GPU 4</option>
+          <option value="gpu5">GPU 5</option>
+          <option value="gpu6">GPU 6</option>
+          <option value="gpu7">GPU 7</option>
+        </select>
+      </div>
+      """
+      
+      # Function to get options from form
+      def get_options_from_form(formdata):
+          options = {}
+          if formdata and 'profile' in formdata:
+              options['profile'] = formdata['profile'][0]
+          else:
+              options['profile'] = 'default'
+          return options
+      
+      c.Spawner.options_from_form = get_options_from_form
+      
+      # Function to apply profile settings
+      def user_options(self):
+          profile = self.user_options.get('profile', 'default')
+          for p in self.profile_list:
+              if p['slug'] == profile:
+                  self.merge_profiles(p['kubespawner_override'])
+                  break
+      
+      c.Spawner.user_options = user_options
+singleuser:
+  profileList:
+    - display_name: "Default Instance"
+      description: "Standard non-GPU instance"
+      slug: "default"
+      kubespawner_override:
+        cpu_limit: 2
+        mem_limit: 4G
+        image: quay.io/jupyterhub/k8s-singleuser-sample:4.2.0
+    - display_name: "GPU 0,1"
+      description: "Access to GPU id 0,1"
+      slug: "gpu1"
+      kubespawner_override:
+        image: quay.io/jupyterhub/k8s-singleuser-sample:4.2.0
+        extra_resource_limits:
+          nvidia.com/gpu: "0"
+          nvidia.com/gpu: "1"
+        environment:
+          NVIDIA_VISIBLE_DEVICES: "0,1"
+    - display_name: "GPU 2"
+      description: "Access to GPU ID 2"
+      slug: "gpu2"
+      kubespawner_override:
+#        image: quay.io/jupyterhub/k8s-singleuser-sample:4.2.0
+        image: docker.merai.app/nuvo_images/nvidia_environment:0.7
+        extra_resource_limits:
+          nvidia.com/gpu: "2"
+        environment:
+          NVIDIA_VISIBLE_DEVICES: "2"
+    - display_name: "GPU 3"
+      description: "Access to GPU ID 3"
+      slug: "gpu3"
+      kubespawner_override:
+        image: quay.io/jupyterhub/k8s-singleuser-sample:4.2.0
+#        image: docker.merai.app/nuvo_images/nvidia_environment:0.7
+        extra_resource_limits:
+          nvidia.com/gpu: "3"
+        environment:
+          NVIDIA_VISIBLE_DEVICES: "3"
+    - display_name: "GPU 4"
+      description: "Access to GPU ID 4"
+      slug: "gpu4"
+      kubespawner_override:
+        image: quay.io/jupyterhub/k8s-singleuser-sample:4.2.0
+#        image: nvidia/cuda:12.6.3-cudnn-runtime-ubuntu24.04
+        extra_resource_limits:
+          nvidia.com/gpu: "4"
+        environment:
+          NVIDIA_VISIBLE_DEVICES: "4"
+    - display_name: "GPU 5"
+      description: "Access to GPU ID 5"
+      slug: "gpu5"
+      kubespawner_override:
+        image: quay.io/jupyterhub/k8s-singleuser-sample:4.2.0
+        extra_resource_limits:
+          nvidia.com/gpu: "5"
+        environment:
+          NVIDIA_VISIBLE_DEVICES: "5"
+    - display_name: "GPU 6"
+      description: "Access to GPU ID 6"
+      slug: "gpu6"
+      kubespawner_override:
+        image: quay.io/jupyterhub/k8s-singleuser-sample:4.2.0
+        extra_resource_limits:
+          nvidia.com/gpu: "6"
+        environment:
+          NVIDIA_VISIBLE_DEVICES: "6"
+    - display_name: "GPU 7"
+      description: "Access to GPU ID 7"
+      slug: "gpu7"
+      kubespawner_override:
+        image: quay.io/jupyterhub/k8s-singleuser-sample:4.2.0
+        extra_resource_limits:
+          nvidia.com/gpu: "7"
+        environment:
+          NVIDIA_VISIBLE_DEVICES: "7"
+
+  storage:
+    type: dynamic
+    dynamic:
+      storageClass: nfs-jupyterhub
+    capacity: 100Gi
+    homeMountPath: /home/jovyan/work
+  initContainers:
+    - name: init-gpu
+      image: nvidia/cuda:12.2.0-runtime-ubuntu22.04
+      command:
+        - sleep
+        - "1"
