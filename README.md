@@ -143,6 +143,8 @@ hub:
 upgrade the version:
 `helm upgrade --install jhub jupyterhub/jupyterhub   --namespace jupyter   --create-namespace   -f config.yaml`
 
+This is the document of different kind of authenticators: https://jupyterhub.readthedocs.io/en/latest/reference/authenticators.html
+
 If You face error like,
 If error while upgrading service:
 Error: Get "https://jupyterhub.github.io/helm-chart/jupyterhub-4.2.0.tgz": EOF
@@ -209,3 +211,37 @@ singleuser:
 ```
 Upgrade version:
 `helm upgrade --install jhub jupyterhub/jupyterhub   --namespace jupyter   --create-namespace   -f config.yaml`
+
+Create profiles:
+----------------
+```yaml
+hub:
+  config:
+    JupyterHub:
+      authenticator_class: dummy
+    DummyAuthenticator:
+      password: "admin@123"
+    Authenticator:
+      allowed_users:
+        - admin
+      admin_users:
+        - admin
+
+singleuser:
+  profileList:
+    - display_name: "GPU 0"
+      description: "Access to GPU id 0"
+      kubespawner_override:
+        extra_resource_limits:
+          nvidia.com/gpu: "1"
+        environment:
+          NVIDIA_VISIBLE_DEVICES: "0"
+    - display_name: "GPU 1"
+      description: "Access to GPU ID 1"
+      kubespawner_override:
+        extra_resource_limits:
+          nvidia.com/gpu: "1"
+        environment:
+          NVIDIA_VISIBLE_DEVICES: "1"
+```
+
