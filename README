@@ -1,7 +1,7 @@
 Jupyerhub installation with Kubernetes:
 The setup is done through the official documentation - https://z2jh.jupyter.org/en/stable/
 
-This Project covers below points:
+##  $\color{blue} \textbf {Project  Workflow}$
 1. Helm installation
 2. Jupyterhub installation with helm chart.
 3. Assign GPU to users.
