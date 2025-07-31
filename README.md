@@ -399,6 +399,13 @@ Setup of multiple profile selection with custom image:
 config.yaml
 https://github.com/purvalpatel/jupyterhub-helm/blob/ef5596f32b105fce027667ff47cf65750c7b5b96/test/profile-selection-custom-image.yaml
 
+start-singleuser.sh
+https://github.com/purvalpatel/jupyterhub-helm/blob/fa7053bc1b3175409e8d24fc048b31e2a6a939e7/test/start-singleuser.sh
+
+Dockerfile
+https://github.com/purvalpatel/jupyterhub-helm/blob/fa7053bc1b3175409e8d24fc048b31e2a6a939e7/test/Dockerfile
+
+
 
 
 
