@@ -373,5 +373,17 @@ singleuser:
         - sleep
         - "1"
 ```
+How to increase size of PVC ?
+----------------------
+`kubectl edit pvc pvc-9ec25323-19a6-4ce1-a3cd-baa5d89d1151`
+Editing this directly wont works.
+
+Increase size in config.yaml.
+upgrade version:
+`helm upgrade --install --cleanup-on-fail jhub jupyterhub/jupyterhub   --namespace jupyter   --create-namespace   -f config.yaml`
+
+Need to delete and re-created PVC. then it will show the updated size.
+Make sure the StorageClass Policy is Retain.
+
 
 
