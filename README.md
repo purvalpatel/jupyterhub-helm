@@ -409,6 +409,38 @@ dind-entrypoint.sh
 https://github.com/purvalpatel/jupyterhub-helm/blob/78dc3b84d8c8b193816d066073e3798656c82349/test/dind-entrypoint.sh
 
 
+Ask for extra parameters on sign up:
+--------------------------------
+config.yaml
+```yaml
+hub:
+  config:
+    JupyterHub:
+      authenticator_class: nativeauthenticator.NativeAuthenticator
+    Authenticator:
+      allowed_users:
+        - admin
+      admin_users:
+        - admin
+    NativeAuthenticator:
+      enable_signup: true
+      enable_change_password: true
+      create_users: true
+      allow_admin_access: true
+#      allow_unauthenticated_users: true
+  extraConfig:
+    adminUsers: |
+      c.Authenticator.admin_users = {'admin'}
+    native: |
+      c.Authenticator.enable_auth_state = True
+      c.NativeAuthenticator.ask_email_on_signup = True
+      c.NativeAuthenticator.enable_password_change = True
+```
 
+Upgrade version:
+`helm upgrade --install jhub jupyterhub/jupyterhub   --namespace jupyter   --create-namespace   -f config.yaml`
+
+
+GPU Selection Dropdown:
 
 
