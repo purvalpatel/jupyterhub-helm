@@ -1,6 +1,6 @@
 
 <h1 align="center">
-     Jupyterhub Helm
+     Jupyterhub kubernetes setup
     <br>
 </h1>
 
