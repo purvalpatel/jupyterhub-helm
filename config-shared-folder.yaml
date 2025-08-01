@@ -1,0 +1,209 @@
+hub:
+  config:
+    JupyterHub:
+      authenticator_class: nativeauthenticator.NativeAuthenticator
+    Authenticator:
+      allowed_users:
+        - admin
+        - shishanshu
+        - nishant
+      admin_users:
+        - admin
+    NativeAuthenticator:
+      enable_signup: true
+      enable_change_password: true
+      create_users: true
+      allow_admin_access: true
+#      allow_unauthenticated_users: true
+
+  extraConfig:
+    native: |
+      c.Authenticator.enable_auth_state = True
+      c.NativeAuthenticator.enable_password_change = True
+      c.Spawner.auth_state_enabled = True       # added for admin user login verify
+
+    spawnerForm: |
+      # Define available Docker images
+      DOCKER_IMAGES = [
+          "quay.io/jupyterhub/k8s-singleuser-sample:4.2.0",
+          "docker.merai.app/nuvo_images/nvidia_environment:0.7",
+          "jupyter/base-notebook:latest",
+          "jupyter/r-notebook:latest",
+          "jupyter/scipy-notebook:latest"
+      ]
+
+      # Define available GPU IDs (adjust based on your cluster)
+      GPU_IDS = ["none", "0", "1", "2", "3", "4", "5", "6", "7", "0,1", "2,3", "4,5", "6,7", "all"]
+
+      # Build the options form
+
+      def get_options_form(spawner):
+          print("===================================")
+          print(spawner.user.admin)                     ## shows True/False if user is admin or not
+          print(spawner.user.name)                      ## shows the username of the user
+          print(spawner.handler.current_user.name)      ## this will display the logged in username 
+          ## you can check this logs by # kubectl logs hub-xxxxxxxxx
+
+          #### If logged in user is not admin then do not display the form.
+          if not spawner.handler.current_user.name == "admin":
+              return ""
+
+          options_html = """
+          <div class="form-group">
+            <label for="image">Docker Image</label>
+            <select name="image" class="form-control" required>
+          """
+          
+          # Docker images dropdown
+          for image in DOCKER_IMAGES:
+              selected = "selected" if image == getattr(spawner, 'image', '') else ""
+              options_html += f'<option value="{image}" {selected}>{image}</option>'
+          
+          options_html += """
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="gpu_id">GPU ID</label>
+            <select name="gpu_id" class="form-control">
+          """
+          
+          # GPU IDs dropdown
+          for gpu_id in GPU_IDS:
+              options_html += f'<option value="{gpu_id}">{gpu_id if gpu_id != "none" else "No GPU"}</option>'
+          
+          options_html += """
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="cpu_limit">CPU Limit</label>
+            <input type="text" name="cpu_limit" class="form-control" 
+                   value="2" 
+                   placeholder="Number of CPUs (e.g., 2)">
+          </div>
+
+          <div class="form-group">
+            <label for="mem_limit">Memory Limit</label>
+            <input type="text" name="mem_limit" class="form-control" 
+                   value="4G" 
+                   placeholder="Memory with unit (e.g., 4G)">
+          </div>
+
+          <div class="form-group">
+            <label for="days_to_live">Days to Live</label>
+            <input type="text" name="days_to_live" class="form-control" 
+                   value="7" placeholder="Number of days (e.g., 7)">
+          </div>
+          """
+          return options_html
+
+      c.Spawner.options_form = get_options_form
+
+      # Process form submission
+      def get_options_from_form(formdata):
+          print("Received formdata:", formdata)
+          options = {}
+          if formdata:
+              image = formdata.get('image', [''])[0]
+              print("Selected image:", image)
+              gpu_id = formdata.get('gpu_id', [''])[0]
+              print("Selected GPU ID:", gpu_id)
+              cpu_limit = formdata.get('cpu_limit', ['2'])[0]
+              mem_limit = formdata.get('mem_limit', ['4G'])[0]
+              days_to_live = formdata.get('days_to_live', ['7'])[0]
+
+              if image:
+                  options['image'] = image
+              if gpu_id and gpu_id != "none":
+                  # Handle multiple GPU selection properly
+                  if gpu_id == "all":
+                      options['extra_resource_limits'] = {"nvidia.com/gpu": str(len(GPU_IDS)-2)}
+                      options['environment'] = {"NVIDIA_VISIBLE_DEVICES": "all"}
+                  elif "," in gpu_id:
+                      # For multiple GPUs (e.g., "0,1"), we request the count
+                      gpu_count = len(gpu_id.split(","))
+                      options['extra_resource_limits'] = {"nvidia.com/gpu": str(gpu_count)}
+                      options['environment'] = {"NVIDIA_VISIBLE_DEVICES": gpu_id}
+                  else:
+                      # Single GPU
+                      options['extra_resource_limits'] = {"nvidia.com/gpu": "1"}
+                      options['environment'] = {"NVIDIA_VISIBLE_DEVICES": gpu_id}
+
+              try:
+                  options['cpu_limit'] = float(cpu_limit)
+              except ValueError:
+                  options['cpu_limit'] = 2.0
+
+              if mem_limit:
+                  options['mem_limit'] = mem_limit
+
+              try:
+                  options['days_to_live'] = int(days_to_live)
+              except ValueError:
+                  options['days_to_live'] = 7
+
+          return options
+
+      c.Spawner.options_from_form = get_options_from_form
+      c.JupyterHub.spawner_class = 'kubespawner.KubeSpawner'
+      async def apply_user_options(spawner):
+          print("DEBUG: pre_spawn_hook executing")
+          options = spawner.user_options if hasattr(spawner, 'user_options') else {}
+          print(options)
+          if not options:
+              print("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")
+              print("DEBUG: No user options found, skipping pre_spawn_hook")
+              return 
+          # Access the options that were processed by options_from_form
+          if hasattr(spawner, 'user_options'):
+              options = spawner.user_options
+              print(f"DEBUG: User options: {options}")
+              
+              # Apply image
+              if 'image' in options:
+                  spawner.image = options['image']
+                  print(f"DEBUG: Set image to: {spawner.image}")
+              
+              # Apply GPU configuration
+              if 'extra_resource_limits' in options:
+                  spawner.extra_resource_limits = options['extra_resource_limits']
+                  print(f"DEBUG: Set resource limits: {spawner.extra_resource_limits}")
+              
+              if 'environment' in options:
+                  if not hasattr(spawner, 'environment'):
+                      spawner.environment = {}
+                  spawner.environment.update(options['environment'])
+                  print(f"DEBUG: Updated environment: {spawner.environment}")
+              
+              # Apply CPU/memory
+              if 'cpu_limit' in options:
+                  spawner.cpu_limit = float(options['cpu_limit'])
+                  print(f"DEBUG: Set CPU limit: {spawner.cpu_limit}")
+              
+              if 'mem_limit' in options:
+                  spawner.mem_limit = options['mem_limit']
+                  print(f"DEBUG: Set memory limit: {spawner.mem_limit}")
+
+      c.KubeSpawner.pre_spawn_hook = apply_user_options
+
+      # 5. Debugging configuration
+      print("DEBUG: Configuration complete")
+      print(f"DEBUG: Spawner class: {c.JupyterHub.spawner_class}")
+      print(f"DEBUG: pre_spawn_hook assigned: {hasattr(c.KubeSpawner, 'pre_spawn_hook')}")
+
+singleuser:
+  storage:
+    type: dynamic
+    dynamic:
+      storageClass: nfs-jupyterhub
+    capacity: 100Gi
+    homeMountPath: /home/jovyan/work
+    extraVolumes:
+          - name: network-share
+            persistentVolumeClaim:
+              claimName: jupyter-network-share-pvc
+    extraVolumeMounts:
+      - name: network-share
+        mountPath: /home/jovyan/shared  # Better location for Jupyter
+        subPath: "Notebook-public"
