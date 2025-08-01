@@ -462,6 +462,54 @@ To add R Launcher:
           NVIDIA_VISIBLE_DEVICES: "6"
 ```
 
+Provide shared folder between all users:
+--------------------------------------
+Create NFS share location:
+```bash
+mkdir /mnt/notebook-share
+echo "/mnt/notebook-share   *(rw,sync,no_subtree_check,no_root_squash,no_all_squash,insecure)" >>/etc/exports
+
+exportfs -ra
+sudo systemctl restart nfs-kernel-server
+```
+
+Create PV and PVC which is used on shared folder:
+
+shared-pv-pvc.yaml
+```yaml
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: jupyter-network-share-pv
+spec:
+  capacity:
+    storage: 1000Gi
+  accessModes:
+    - ReadWriteMany
+  nfs:
+    server: 10.10.110.22
+    path: "/mnt/notebook-share"
+  storageClassName: "nfs-jupyterhub"
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: jupyter-network-share-pvc
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 1000Gi  # Should match PV size
+  storageClassName: "nfs-jupyterhub"  # Must match PV
+  volumeName: jupyter-network-share-pv
+
+```
+apply changes:
+`kubectl apply -f shared-pv-pvc.yaml`
+
+updated config.yaml:
 
 
-
+apply changes:
+`helm upgrade --install --cleanup-on-fail jhub jupyterhub/jupyterhub   --namespace jupyter   --create-namespace   -f config.yaml`
