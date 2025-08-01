@@ -461,9 +461,16 @@ To add R Launcher:
         environment:
           NVIDIA_VISIBLE_DEVICES: "6"
 ```
+Complete Project with resource selection:
+--------------
+<img width="1001" height="553" alt="image" src="https://github.com/user-attachments/assets/1270b77c-ae91-419f-9301-e8eea0adf39e" />
+
+[config.yaml](https://github.com/purvalpatel/jupyterhub-helm/blob/55abef6c99ad85e26f19a80fe1406e918c2c4766/config.yaml)
 
 Provide shared folder between all users:
 --------------------------------------
+<img width="753" height="473" alt="image" src="https://github.com/user-attachments/assets/a1035600-41f7-436d-ac8a-7338d2203ecb" />
+
 Create NFS share location:
 ```bash
 mkdir /mnt/notebook-share
