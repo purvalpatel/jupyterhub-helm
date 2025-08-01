@@ -9,6 +9,10 @@ The setup is done through the official documentation - https://z2jh.jupyter.org/
 
 Note: This is the research document of jupyterhub setup with helm.
 
+purpose:
+-----
+This project provides a complete setup of JupyterHub on Kubernetes using Helm, tailored for multi-user environments with resource customization and persistent storage. It includes user management with support for local or external authentication and a dynamic spawner form integrated with KubeSpawner. The spawner form enables configuration of Docker image, GPU device(s), CPU and RAM allocation, and Time-To-Live (TTL) for automatic notebook cleanup. However, resource selection is restricted to admins only—regular users cannot choose or modify resource configurations themselves. Each user's working directory is persistently stored using PVCs (Persistent Volume Claims), ensuring data retention across sessions. This setup is ideal for shared GPU servers or research environments where users need isolated, configurable Jupyter notebook instances on-demand under admin-controlled resource policies.
+
 Project workflow
 -------------------------
 1. Helm installation
@@ -463,6 +467,8 @@ To add R Launcher:
 ```
 Complete Project with resource selection:
 --------------
+This project provides a complete setup of JupyterHub on Kubernetes using Helm, tailored for multi-user environments with resource customization and persistent storage. It includes user management with support for local or external authentication and a dynamic spawner form integrated with KubeSpawner. The spawner form enables configuration of Docker image, GPU device(s), CPU and RAM allocation, and Time-To-Live (TTL) for automatic notebook cleanup. However, resource selection is restricted to admins only—regular users cannot choose or modify resource configurations themselves. Each user's working directory is persistently stored using PVCs (Persistent Volume Claims), ensuring data retention across sessions. This setup is ideal for shared GPU servers or research environments where users need isolated, configurable Jupyter notebook instances on-demand under admin-controlled resource policies.
+
 <img width="1001" height="553" alt="image" src="https://github.com/user-attachments/assets/1270b77c-ae91-419f-9301-e8eea0adf39e" />
 
 [config.yaml](https://github.com/purvalpatel/jupyterhub-helm/blob/55abef6c99ad85e26f19a80fe1406e918c2c4766/config.yaml)
