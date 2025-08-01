@@ -509,7 +509,7 @@ apply changes:
 `kubectl apply -f shared-pv-pvc.yaml`
 
 updated config.yaml:
-
+[config.yaml](https://github.com/purvalpatel/jupyterhub-helm/blob/72b08391965b0b85fcf054d29134fa10887936c0/config-shared-folder.yaml)
 
 apply changes:
 `helm upgrade --install --cleanup-on-fail jhub jupyterhub/jupyterhub   --namespace jupyter   --create-namespace   -f config.yaml`
