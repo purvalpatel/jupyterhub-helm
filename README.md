@@ -575,3 +575,4 @@ Apply changes:
 `kubectl apply -f jupyterhub-spawn-logs-pvc.yaml`
 
 Make changes in config.yaml
+[store-spawning-logs-config.yaml](https://github.com/purvalpatel/jupyterhub-helm/blob/08f86fa4de7514b2d2d7f0ba053efd6ec2953e24/store-spawning-logs-config.yaml)
