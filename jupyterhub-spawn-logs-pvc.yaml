@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: jupyterhub-spawn-logs
+  namespace: jupyter
+  labels:
+    app: jupyterhub
+    component: spawn-logs
+spec:
+  accessModes:
+    - ReadWriteMany
+  storageClassName: nfs-jupyterhub
+  resources:
+    requests:
+      storage: 10Gi
