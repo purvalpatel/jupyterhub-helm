@@ -526,3 +526,15 @@ updated config.yaml:
 
 apply changes:
 `helm upgrade --install --cleanup-on-fail jhub jupyterhub/jupyterhub   --namespace jupyter   --create-namespace   -f config.yaml`
+
+Store credentials of docker registry permenantly with containerd:
+---------------
+nano /etc/containerd/config.tom
+```toml
+      [plugins."io.containerd.grpc.v1.cri".registry.configs."docker.test.com".auth]
+          username = "abc"
+          password = "abc1234"
+
+```
+restart service:
+`systemctl restart containerd`
