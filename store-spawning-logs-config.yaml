@@ -235,13 +235,13 @@ singleuser:
         persistentVolumeClaim:
           claimName: jupyter-network-share-pvc
       ### added for storing logs
-      - name: spawn-logs
-        persistentVolumeClaim:
-          claimName: jupyterhub-spawn-logs
+      # - name: spawn-logs
+      #   persistentVolumeClaim:
+      #     claimName: jupyterhub-spawn-logs
     extraVolumeMounts:
       - name: network-share
         mountPath: /home/jovyan/shared
         subPath: "Notebook-public" 
-      ### added for storing logs
-      - name: spawn-logs
+      ### added for storing logs  - will store the logs in already created PVC
+      - name: network-share
         mountPath: /srv/jupyterhub/spawn-logs
