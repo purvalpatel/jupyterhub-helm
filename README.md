@@ -541,3 +541,7 @@ restart service:
 
 Now you can pull the images, below is the sample command:
 `crictl pull docker.test.com/xxxxxx/jupyterhub-remote-desktop:0.1`
+
+Check user wise resource allocation:
+----------------------
+`kubectl get pods -o jsonpath='{range .items[*]}{.metadata.name}{"\t"}{.spec.containers[0].image}{"\t"}{.spec.containers[0].resources}{"\n"}{end}'`
