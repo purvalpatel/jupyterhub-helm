@@ -545,3 +545,33 @@ Now you can pull the images, below is the sample command:
 Check user wise resource allocation:
 ----------------------
 `kubectl get pods -o jsonpath='{range .items[*]}{.metadata.name}{"\t"}{.spec.containers[0].image}{"\t"}{.spec.containers[0].resources}{"\n"}{end}'`
+
+Store Spawn logs of each users:
+--------------------------------
+
+Create pvc for mount log directory:
+jupyterhub-spawn-logs-pvc.yaml
+
+```yaml
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: jupyterhub-spawn-logs
+  namespace: jupyter
+  labels:
+    app: jupyterhub
+    component: spawn-logs
+spec:
+  accessModes:
+    - ReadWriteMany
+  storageClassName: nfs-jupyterhub
+  resources:
+    requests:
+      storage: 10Gi
+
+```
+Apply changes:
+
+`kubectl apply -f jupyterhub-spawn-logs-pvc.yaml`
+
+Make changes in config.yaml
