@@ -130,6 +130,11 @@ In rocm images with jupyterhub there is no rocm driver intalled and due to this 
 
 
 Create pvc:
+This PVC is used for seperate user wise data and shared folder which we will mount on all users.
+
+Same PVC we will use for both purpose.
+
+
 shared-pvc.yaml
 ```
 apiVersion: v1
