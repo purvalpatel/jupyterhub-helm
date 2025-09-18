@@ -1,14 +1,14 @@
 Setup Jupyterhub with AMD GPU operator.
 ---------------------------------------
-Prerequisites.
+###Prerequisites.
 1. ROCM is installed on server.
 2. rocm-smi should list the GPU's.
 
 ### Install kubernetes:
 
-1.Swap disable
+#### 1.Swap disable
 
-2.Install tools: (on both master and worker)
+#### 2.Install tools: (on both master and worker)
 ```
 sudo apt-get update# apt-transport-https may be a dummy package; if so, you can skip that package
 sudo apt-get install -y apt-transport-https ca-certificates curl gpg
@@ -24,7 +24,7 @@ sudo apt-mark hold kubelet kubeadm kubectl
 sudo systemctl enable --now kubelet
 ```
 
-3.Enable IPv4 packet forwarding:
+#### 3.Enable IPv4 packet forwarding:
 ```
 cat <<EOF | sudo tee /etc/sysctl.d/k8s.confnet.ipv4.ip_forward = 1
 EOF
@@ -37,32 +37,32 @@ sudo sysctl --system
 sysctl net.ipv4.ip_forward
 ```
 
-Set container runtime for kubernetes:
+#### 4. Set container runtime for kubernetes:
 
 Ref: https://v1-31.docs.kubernetes.io/docs/setup/production-environment/container-runtimes/
 
-Install containerd:(on both master and worker)
+##### Install containerd:(on both master and worker)
 ```
 #sudo apt install -y containerd
 ```
 
-Create default config ( on master and worker )
+##### Create default config ( on master and worker )
 ```
 sudo mkdir -p /etc/containerd
 containerd config default | sudo tee /etc/containerd/config.toml
 ```
 
-Use systemd as cgroup driver
+##### Use systemd as cgroup driver
 ```
 sudo sed -i 's/SystemdCgroup = false/SystemdCgroup = true/' /etc/containerd/config.toml
 ```
 
-Restart service
+##### Restart service
 ```
 sudo systemctl restart containerd
 ```
 
-4.Initialize master node:
+#### 4.Initialize master node:
 ```
 sudo kubeadm init --pod-network-cidr=192.168.0.0/16
 
@@ -71,7 +71,7 @@ sudo cp /etc/kubernetes/admin.conf $HOME/.kube/config
 sudo chown $(id -u):$(id -g) $HOME/.kube/config
 ```
 
-5.Install CNI plugin:
+#### 5.Install CNI plugin:
 ```
 kubectl apply -f https://docs.projectcalico.org/manifests/calico.yaml
 ```
@@ -82,15 +82,20 @@ curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scrip
 chmod 700 get_helm.sh
 ./get_helm.sh
 ```
-verify the installation: `helm version`
+#### verify the installation: 
+`helm version`
 
-##### Setup dynamic path provisioner:
+### Setup dynamic path provisioner:
+This will use to create automatic PVC with pods.
+
+We can change the default location of the storage of this.
+
 ```
 kubectl apply -f https://raw.githubusercontent.com/rancher/local-path-provisioner/master/deploy/local-path-storage.yaml
 sudo mkdir -p /opt/local-path-provisioner
 sudo chmod 0777 /opt/local-path-provisioner
 
-Kubectl get all -n jupyter
+kubectl get all -n jupyter
 
 #If want to change the default storage then,
 kubectl edit configmap local-path-config -n local-path-storage
@@ -101,20 +106,20 @@ kubectl patch storageclass local-path -p '{"metadata": {"annotations":{"storagec
 
 ### Setup jupyterhub:
 
-Create directory
+#### Create directory
 ```
 mkdir /mnt/kubernetes/jupyterhub
 cd /mnt/kubernetes/jupyterhub
 touch config.yaml
 ```
 
-Add repository
+##### Add repository
 ```
 helm repo add jupyterhub https://hub.jupyter.org/helm-chart/
 helm repo update
 ```
 
-Start pods with below command
+##### Start installation with below command
 ```
  helm upgrade --cleanup-on-fail \
   --install jhub jupyterhub/jupyterhub \
@@ -123,7 +128,6 @@ Start pods with below command
   --version=3.3.7 \
   --values config.yaml
 ```
-
 
 ##### Note:
 In rocm images with jupyterhub there is no rocm driver intalled and due to this pod is showing not ready because gpu is not assigned to pod.
