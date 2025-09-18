@@ -58,11 +58,38 @@ helm repo update
   --version=3.3.7 \
   --values config.yaml
 ```
+Create dynamic provisioning or NFS storage class for PVC.
 
+Here we are creating dynamic storageclass for local path:
+
+kubectl apply -f https://raw.githubusercontent.com/rancher/local-path-provisioner/master/deploy/local-path-storage.yaml
+
+Then create the PVC storage local path,
+```
+sudo mkdir -p /opt/local-path-provisioner
+sudo chmod 0777 /opt/local-path-provisioner
+```
+If want to change the local storage path then, change the path:
+```
+kubectl edit configmap local-path-config -n local-path-storage
+```
 
 This will create namespace: jupyter
 check this with,
 `kubectl get ns`
+
+List all the resources created in jupyter namespace:
+```
+Kubectl get all -n jupyter
+```
+If pod is pending and pvc is in pending means pvc is not assigned with storageclass.
+
+Then patch it,
+```
+kubectl patch storageclass local-path -p '{"metadata": {"annotations":{"storageclass.kubernetes.io/is-default-class":"true"}}}'
+```
+
+And delete pod. 
 
 Switch to default jupyter namespace so you dont have to write namespace every time:
 `kubectl config set-context --current --namespace=jupyter`
