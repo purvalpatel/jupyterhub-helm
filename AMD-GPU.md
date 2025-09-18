@@ -1,3 +1,10 @@
+Setup Jupyterhub with AMD GPU operator.
+---------------------------------------
+Prerequisites.
+1. ROCM is installed on server.
+2. rocm-smi should list the GPU's.
+
+
 ```
 hub:
   config:
@@ -240,3 +247,9 @@ singleuser:
         mountPath: /home/jovyan/shared
         subPath: "Notebook-public"
 ```
+Now verify GPU is passed with pod or not.
+```
+kubectl describe pod jupyter-shishanshu -n jupyter
+```
+
+<img width="975" height="491" alt="image" src="https://github.com/user-attachments/assets/4699f96a-64d7-4f51-8cff-c576610f33df" />
