@@ -4,71 +4,127 @@ Prerequisites.
 1. ROCM is installed on server.
 2. rocm-smi should list the GPU's.
 
+### Install kubernetes:
 
-```
-hub:
-  config:
-    JupyterHub:
-      authenticator_class: dummy
-    DummyAuthenticator:
-      password: "admin@123"
-    Authenticator:
-      allowed_users:
-        - admin
-      admin_users:
-        - admin
+1.Swap disable
 
-singleuser:
-  storage:
-    type: dynamic
-    dynamic:
-      storageClass: local-path
-    capacity: 10Gi
-    homeMountPath: /home/jovyan/work
-  extraEnv:
-    ROCR_VISIBLE_DEVICES: all          # AMD GPU(s)
-    ROCM_DEVICE_VISIBLE_DEVICES: all   # optional, depending on plugin version
-  extraContainers:
-    - name: init-gpu
-      image: rocm/rocm-terminal:5.7     # ROCm base image
-      command: [ "sleep", "1" ]
+2.Install tools: (on both master and worker)
 ```
-Apply changes.
-```
- helm upgrade --install jhub jupyterhub/jupyterhub   --namespace jupyter   --create-namespace   -f config.yaml
+sudo apt-get update# apt-transport-https may be a dummy package; if so, you can skip that package
+sudo apt-get install -y apt-transport-https ca-certificates curl gpg
+# sudo mkdir -p -m 755 /etc/apt/keyrings
+curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.31/deb/Release.key | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+
+echo 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.31/deb/ /' | sudo tee /etc/apt/sources.list.d/kubernetes.list
+
+sudo apt-get update
+sudo apt-get install -y kubelet kubeadm kubectl
+sudo apt-mark hold kubelet kubeadm kubectl
+
+sudo systemctl enable --now kubelet
 ```
 
-Specific GPU pass:
+3.Enable IPv4 packet forwarding:
 ```
-hub:
-  config:
-    JupyterHub:
-      authenticator_class: dummy
-    DummyAuthenticator:
-      password: "admin@123"
-    Authenticator:
-      allowed_users:
-        - admin
-      admin_users:
-        - admin
+cat <<EOF | sudo tee /etc/sysctl.d/k8s.confnet.ipv4.ip_forward = 1
+EOF
 
-singleuser:
-  storage:
-    type: dynamic
-    dynamic:
-      storageClass: local-path
-    capacity: 10Gi
-    homeMountPath: /home/jovyan/work
+sudo sysctl -w net.ipv4.ip_forward=1
+echo "net.ipv4.ip_forward = 1" | sudo tee /etc/sysctl.d/99-kubernetes-ip-forward.conf
 
-  extraEnv:
-    ROCR_VISIBLE_DEVICES: "1"          # Select AMD GPU 1
-    ROCM_DEVICE_VISIBLE_DEVICES: "1"   # Optional, depending on ROCm plugin version
+sudo sysctl --system
 
-  extraContainers:
-    - name: init-gpu
-      image: rocm/rocm-terminal:5.7   # ROCm base image
-      command: ["sleep", "1"]
+sysctl net.ipv4.ip_forward
 ```
+
+Set container runtime for kubernetes:
+Ref: https://v1-31.docs.kubernetes.io/docs/setup/production-environment/container-runtimes/
+
+Install containerd:(on both master and worker)
+```
+#sudo apt install -y containerd
+```
+
+Create default config ( on master and worker )
+```
+sudo mkdir -p /etc/containerd
+containerd config default | sudo tee /etc/containerd/config.toml
+```
+
+Use systemd as cgroup driver
+```
+sudo sed -i 's/SystemdCgroup = false/SystemdCgroup = true/' /etc/containerd/config.toml
+```
+
+Restart service
+```
+sudo systemctl restart containerd
+```
+
+4.Initialize master node:
+```
+sudo kubeadm init --pod-network-cidr=192.168.0.0/16
+
+mkdir -p $HOME/.kube
+sudo cp /etc/kubernetes/admin.conf $HOME/.kube/config
+sudo chown $(id -u):$(id -g) $HOME/.kube/config
+```
+
+5.Install CNI plugin:
+```
+kubectl apply -f https://docs.projectcalico.org/manifests/calico.yaml
+```
+
+### Install helm:
+```
+curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
+chmod 700 get_helm.sh
+./get_helm.sh
+```
+verify the installation: `helm version`
+
+##### Setup dynamic path provisioner:
+```
+kubectl apply -f https://raw.githubusercontent.com/rancher/local-path-provisioner/master/deploy/local-path-storage.yaml
+sudo mkdir -p /opt/local-path-provisioner
+sudo chmod 0777 /opt/local-path-provisioner
+
+Kubectl get all -n jupyter
+
+#If want to change the default storage then,
+kubectl edit configmap local-path-config -n local-path-storage
+
+#Set default storage class.
+kubectl patch storageclass local-path -p '{"metadata": {"annotations":{"storageclass.kubernetes.io/is-default-class":"true"}}}'
+```
+
+### Setup jupyterhub:
+
+Create directory
+```
+mkdir /mnt/kubernetes/jupyterhub
+cd /mnt/kubernetes/jupyterhub
+touch config.yaml
+```
+
+Add repository
+```
+helm repo add jupyterhub https://hub.jupyter.org/helm-chart/
+helm repo update
+```
+
+Start pods with below command
+```
+ helm upgrade --cleanup-on-fail \
+  --install jhub jupyterhub/jupyterhub \
+  --namespace jupyter \
+  --create-namespace \
+  --version=3.3.7 \
+  --values config.yaml
+Jupyterhub installed with helm.
+```
+
+
 ### Note:
 In rocm images with jupyterhub there is no rocm driver intalled and due to this pod is showing not ready because gpu is not assigned to pod.
 
@@ -88,7 +144,6 @@ spec:
       storage: 10Gi
   storageClassName: local-path
 ```
-
 
 config.yaml
 ```
@@ -247,6 +302,13 @@ singleuser:
         mountPath: /home/jovyan/shared
         subPath: "Notebook-public"
 ```
+
+Apply changes:
+```
+helm upgrade --install jhub jupyterhub/jupyterhub   --namespace jupyter   --create-namespace   -f config.yaml
+```
+
+
 Now verify GPU is passed with pod or not.
 ```
 kubectl describe pod jupyter-shishanshu -n jupyter
