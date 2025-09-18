@@ -125,6 +125,15 @@ Verify that created Pods enter a Running state:
 
       `kubectl --namespace=jupyter port-forward service/proxy-public 8080:http`
 
+    OR if the existing default service status is pending,
+
+    <img width="922" height="282" alt="image" src="https://github.com/user-attachments/assets/a27d0442-ba70-4609-bf30-c0af717b8db5" />
+    then patch it with Nodeport,
+    ```
+    kubectl patch svc proxy-public -n jupyter -p '{"spec": {"type": "NodePort"}}'
+     ```
+
+
     Try insecure HTTP access: `http://localhost:8080`
     
     <img width="570" height="545" alt="image" src="https://github.com/user-attachments/assets/674cbe59-1612-46da-b7e5-eba11f52fefc" />
