@@ -64,3 +64,21 @@ singleuser:
 ```
 ### Note:
 In rocm images with jupyterhub there is no rocm driver intalled and due to this pod is showing not ready because gpu is not assigned to pod.
+
+
+Create pvc:
+```
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: jupyter-network-share-pvc
+  namespace: jupyter
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+  storageClassName: local-path
+```
+
