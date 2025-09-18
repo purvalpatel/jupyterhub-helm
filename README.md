@@ -129,9 +129,9 @@ Verify that created Pods enter a Running state:
 
     <img width="922" height="282" alt="image" src="https://github.com/user-attachments/assets/a27d0442-ba70-4609-bf30-c0af717b8db5" />
     then patch it with Nodeport,
-    ```
-    kubectl patch svc proxy-public -n jupyter -p '{"spec": {"type": "NodePort"}}'
-     ```
+    
+    `kubectl patch svc proxy-public -n jupyter -p '{"spec": {"type": "NodePort"}}'`
+    
 
 
     Try insecure HTTP access: `http://localhost:8080`
