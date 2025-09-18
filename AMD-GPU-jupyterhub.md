@@ -329,13 +329,16 @@ Now verify GPU is passed with pod or not.
 ```
 kubectl describe pod jupyter-shishanshu -n jupyter
 ```
+
+<img width="975" height="491" alt="image" src="https://github.com/user-attachments/assets/4699f96a-64d7-4f51-8cff-c576610f33df" />
+
+
 Expose service to NodePort:
 ```
 kubectl patch svc proxy-public -n jupyter -p '{"spec": {"type": "NodePort"}}'
 ```
 
-<img width="975" height="491" alt="image" src="https://github.com/user-attachments/assets/4699f96a-64d7-4f51-8cff-c576610f33df" />
-
 
 Access in browser:
+
 http://<server-ip>:31461/
