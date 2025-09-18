@@ -130,6 +130,7 @@ In rocm images with jupyterhub there is no rocm driver intalled and due to this 
 
 
 Create pvc:
+shared-pvc.yaml
 ```
 apiVersion: v1
 kind: PersistentVolumeClaim
@@ -143,6 +144,10 @@ spec:
     requests:
       storage: 10Gi
   storageClassName: local-path
+```
+Create pvc:
+```
+kubectl apply -f shared-pvc.yaml
 ```
 
 config.yaml
