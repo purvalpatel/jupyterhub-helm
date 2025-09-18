@@ -122,7 +122,6 @@ Start pods with below command
   --create-namespace \
   --version=3.3.7 \
   --values config.yaml
-Jupyterhub installed with helm.
 ```
 
 
