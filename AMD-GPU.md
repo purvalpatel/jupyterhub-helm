@@ -155,6 +155,8 @@ apply changes:
 kubectl apply -f shared-pvc.yaml
 ```
 
+#### Final config.yaml of jupyterhub deployment
+
 config.yaml
 ```
 hub:
