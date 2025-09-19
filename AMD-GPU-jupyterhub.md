@@ -1,6 +1,6 @@
 Setup Jupyterhub with AMD GPU operator.
 ---------------------------------------
-###Prerequisites.
+### Prerequisites.
 1. ROCM is installed on server.
 2. rocm-smi should list the GPU's.
 
