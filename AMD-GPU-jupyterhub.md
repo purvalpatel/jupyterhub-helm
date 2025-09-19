@@ -138,7 +138,6 @@ This PVC is used for seperate user wise data and shared folder which we will mou
 
 Same PVC we will use for both purpose.
 
-
 shared-pvc.yaml
 ```
 apiVersion: v1
@@ -154,7 +153,7 @@ spec:
       storage: 10Gi
   storageClassName: local-path
 ```
-apply changes:
+Apply changes:
 ```
 kubectl apply -f shared-pvc.yaml
 ```
@@ -333,12 +332,12 @@ kubectl describe pod jupyter-shishanshu -n jupyter
 <img width="975" height="491" alt="image" src="https://github.com/user-attachments/assets/4699f96a-64d7-4f51-8cff-c576610f33df" />
 
 
-Expose service to NodePort:
+##### Expose service to NodePort:
 ```
 kubectl patch svc proxy-public -n jupyter -p '{"spec": {"type": "NodePort"}}'
 ```
 
 
-Access in browser:
+##### Access in browser:
 
 http://<server-ip>:31461/
