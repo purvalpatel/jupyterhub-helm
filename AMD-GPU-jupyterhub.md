@@ -169,8 +169,8 @@ hub:
     Authenticator:
       allowed_users:
         - admin
-        - shishanshu
-        - nishant
+        - xxxxxxxxx
+        - xxxxxx
       admin_users:
         - admin
     NativeAuthenticator:
