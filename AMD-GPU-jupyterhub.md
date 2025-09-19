@@ -318,7 +318,7 @@ singleuser:
         subPath: "Notebook-public"
 ```
 
-Apply changes:
+##### Apply changes:
 ```
 helm upgrade --install jhub jupyterhub/jupyterhub   --namespace jupyter   --create-namespace   -f config.yaml
 ```
