@@ -5,7 +5,9 @@
 </h1>
 
 Jupyerhub installation with Kubernetes:
-The setup is done through the official documentation - https://z2jh.jupyter.org/en/stable/
+The setup is done through the official documentation - 
+
+https://z2jh.jupyter.org/en/stable/
 
 Note: This is the research document of jupyterhub setup with helm.
 
